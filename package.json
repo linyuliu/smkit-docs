@@ -1,0 +1,39 @@
+{
+  "name": "smkit-docs",
+  "version": "1.0.0",
+  "description": "SMKit 致力于提供一套 安全、统一、现代化的加密算法工具集",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "docs:clean": "rimraf docs/.vuepress/.cache docs/.vuepress/.temp docs/.vuepress/dist"
+  },
+  "keywords": [
+    "sm2",
+    "sm3",
+    "sm4",
+    "sm9",
+    "zuc",
+    "cryptography",
+    "encryption",
+    "chinese-cryptography"
+  ],
+  "author": "SMKit Team",
+  "license": "MIT",
+  "homepage": "https://github.com/linyuliu/smkit-docs#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linyuliu/smkit-docs.git"
+  },
+  "devDependencies": {
+    "@vuepress/bundler-webpack": "^2.0.0-rc.24",
+    "katex": "^0.16.25",
+    "mermaid": "^11.12.0",
+    "sass": "^1.93.2",
+    "sass-loader": "^16.0.5",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.0",
+    "vuepress": "^2.0.0-rc.24",
+    "vuepress-theme-hope": "^2.0.0-rc.94"
+  }
+}
