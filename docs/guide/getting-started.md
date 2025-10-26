@@ -39,43 +39,22 @@ order: 1
 @tab:active npm
 
 ```bash
-# 安装核心包
-npm install @smkit/core
-
-# 可选：安装特定算法包
-npm install @smkit/sm2
-npm install @smkit/sm3
-npm install @smkit/sm4
-npm install @smkit/sm9
-npm install @smkit/zuc
+# 安装 SMKit
+npm install smkit
 ```
 
 @tab yarn
 
 ```bash
-# 安装核心包
-yarn add @smkit/core
-
-# 可选：安装特定算法包
-yarn add @smkit/sm2
-yarn add @smkit/sm3
-yarn add @smkit/sm4
-yarn add @smkit/sm9
-yarn add @smkit/zuc
+# 安装 SMKit
+yarn add smkit
 ```
 
 @tab pnpm
 
 ```bash
-# 安装核心包
-pnpm add @smkit/core
-
-# 可选：安装特定算法包
-pnpm add @smkit/sm2
-pnpm add @smkit/sm3
-pnpm add @smkit/sm4
-pnpm add @smkit/sm9
-pnpm add @smkit/zuc
+# 安装 SMKit
+pnpm add smkit
 ```
 
 :::
@@ -90,16 +69,9 @@ pnpm add @smkit/zuc
 <!-- 在 pom.xml 中添加依赖 -->
 <dependencies>
     <dependency>
-        <groupId>cn.smkit</groupId>
-        <artifactId>smkit-core</artifactId>
-        <version>1.0.0</version>
-    </dependency>
-    
-    <!-- 可选：安装特定算法包 -->
-    <dependency>
-        <groupId>cn.smkit</groupId>
-        <artifactId>smkit-sm2</artifactId>
-        <version>1.0.0</version>
+        <groupId>io.github.smkit</groupId>
+        <artifactId>smkit-java</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
@@ -109,12 +81,7 @@ pnpm add @smkit/zuc
 ```groovy
 // 在 build.gradle 中添加依赖
 dependencies {
-    implementation 'cn.smkit:smkit-core:1.0.0'
-    
-    // 可选：安装特定算法包
-    implementation 'cn.smkit:smkit-sm2:1.0.0'
-    implementation 'cn.smkit:smkit-sm3:1.0.0'
-    implementation 'cn.smkit:smkit-sm4:1.0.0'
+    implementation 'io.github.smkit:smkit-java:1.0.0-SNAPSHOT'
 }
 ```
 
@@ -131,34 +98,35 @@ SM4 是中国的分组密码标准，适用于数据加密场景。
 @tab:active TypeScript
 
 ```typescript
-import { SM4, Mode } from '@smkit/core';
+import { sm4Encrypt, sm4Decrypt } from 'smkit';
 
-// 创建 SM4 实例
-const sm4 = new SM4();
-
-// 密钥（16字节 / 128位）
+// 密钥（16字节 / 128位，32个十六进制字符）
 const key = '0123456789abcdeffedcba9876543210';
 
 // 待加密的明文
 const plaintext = 'Hello, SMKit! 你好，国密！';
 
-// 加密（默认使用 CBC 模式）
-const encrypted = sm4.encrypt(plaintext, key);
-console.log('密文 (Base64):', encrypted);
+// 加密
+const ciphertext = sm4Encrypt(key, plaintext);
+console.log('密文:', ciphertext);
 
 // 解密
-const decrypted = sm4.decrypt(encrypted, key);
+const decrypted = sm4Decrypt(key, ciphertext);
 console.log('明文:', decrypted);
 // 输出: Hello, SMKit! 你好，国密！
+
+// 使用面向对象 API
+import { SM4 } from 'smkit';
+
+const sm4 = SM4.ECB(key);
+const encrypted = sm4.encrypt('Hello, SMKit!');
+const plain = sm4.decrypt(encrypted);
 ```
 
 @tab JavaScript
 
 ```javascript
-const { SM4 } = require('@smkit/core');
-
-// 创建 SM4 实例
-const sm4 = new SM4();
+const { sm4Encrypt, sm4Decrypt } = require('smkit');
 
 // 密钥（16字节 / 128位）
 const key = '0123456789abcdeffedcba9876543210';
@@ -167,25 +135,21 @@ const key = '0123456789abcdeffedcba9876543210';
 const plaintext = 'Hello, SMKit! 你好，国密！';
 
 // 加密
-const encrypted = sm4.encrypt(plaintext, key);
-console.log('密文 (Base64):', encrypted);
+const ciphertext = sm4Encrypt(key, plaintext);
+console.log('密文:', ciphertext);
 
 // 解密
-const decrypted = sm4.decrypt(encrypted, key);
+const decrypted = sm4Decrypt(key, ciphertext);
 console.log('明文:', decrypted);
 ```
 
 @tab Java
 
 ```java
-import cn.smkit.SM4;
-import cn.smkit.Mode;
+import io.github.smkit.sm4.SM4Util;
 
 public class SM4Demo {
     public static void main(String[] args) {
-        // 创建 SM4 实例
-        SM4 sm4 = new SM4();
-        
         // 密钥（16字节 / 128位）
         String key = "0123456789abcdeffedcba9876543210";
         
@@ -193,11 +157,11 @@ public class SM4Demo {
         String plaintext = "Hello, SMKit! 你好，国密！";
         
         // 加密
-        String encrypted = sm4.encrypt(plaintext, key);
-        System.out.println("密文 (Base64): " + encrypted);
+        String ciphertext = SM4Util.encrypt(key, plaintext);
+        System.out.println("密文: " + ciphertext);
         
         // 解密
-        String decrypted = sm4.decrypt(encrypted, key);
+        String decrypted = SM4Util.decrypt(key, ciphertext);
         System.out.println("明文: " + decrypted);
         // 输出: Hello, SMKit! 你好，国密！
     }
@@ -212,6 +176,8 @@ SM4 支持多种工作模式：
 - **CBC** (Cipher Block Chaining)：密码分组链接模式（推荐）
 - **CTR** (Counter)：计数器模式
 - **GCM** (Galois/Counter Mode)：认证加密模式（最安全）
+- **CFB** (Cipher Feedback)：密文反馈模式
+- **OFB** (Output Feedback)：输出反馈模式
 :::
 
 ### SM3 哈希算法
@@ -223,41 +189,53 @@ SM3 是中国的密码杂凑算法标准，输出256位哈希值。
 @tab:active TypeScript
 
 ```typescript
-import { SM3 } from '@smkit/core';
-
-// 创建 SM3 实例
-const sm3 = new SM3();
+import { digest, hmac } from 'smkit';
 
 // 计算哈希
 const message = 'Hello, World!';
-const hash = sm3.hash(message);
+const hash = digest(message);
 console.log('SM3 哈希:', hash);
+console.log('长度:', hash.length); // 64 (256位)
 
 // HMAC（带密钥的哈希）
 const key = 'secret-key';
-const hmac = sm3.hmac(message, key);
-console.log('SM3 HMAC:', hmac);
+const mac = hmac(key, message);
+console.log('SM3 HMAC:', mac);
+
+// 使用面向对象 API
+import { SM3 } from 'smkit';
+
+const hasher = new SM3();
+hasher.update('Hello, ').update('World!');
+const result = hasher.digest();
+console.log('哈希:', result);
 ```
 
 @tab Java
 
 ```java
-import cn.smkit.SM3;
+import io.github.smkit.sm3.SM3Util;
 
 public class SM3Demo {
     public static void main(String[] args) {
-        // 创建 SM3 实例
-        SM3 sm3 = new SM3();
-        
         // 计算哈希
         String message = "Hello, World!";
-        String hash = sm3.hash(message);
+        String hash = SM3Util.digest(message);
         System.out.println("SM3 哈希: " + hash);
+        System.out.println("长度: " + hash.length()); // 64 (256位)
         
         // HMAC（带密钥的哈希）
         String key = "secret-key";
-        String hmac = sm3.hmac(message, key);
-        System.out.println("SM3 HMAC: " + hmac);
+        String mac = SM3Util.hmac(key, message);
+        System.out.println("SM3 HMAC: " + mac);
+        
+        // 使用面向对象 API
+        import io.github.smkit.sm3.SM3;
+        
+        SM3 hasher = new SM3();
+        hasher.update("Hello, ").update("World!");
+        String result = hasher.digest();
+        System.out.println("哈希: " + result);
     }
 }
 ```
@@ -267,9 +245,9 @@ public class SM3Demo {
 ::: note 应用场景
 SM3 常用于：
 - 数据完整性校验
-- 密码存储
+- 密码存储（加盐哈希）
 - 数字签名
-- 消息认证码 (MAC)
+- 消息认证码 (HMAC)
 :::
 
 ### SM2 非对称加密
@@ -281,65 +259,66 @@ SM2 是基于椭圆曲线的公钥密码算法，支持加密、签名和密钥�
 @tab:active TypeScript
 
 ```typescript
-import { SM2 } from '@smkit/core';
-
-// 创建 SM2 实例
-const sm2 = new SM2();
+import { generateKeyPair, sm2Encrypt, sm2Decrypt, sign, verify } from 'smkit';
 
 // 生成密钥对
-const keyPair = sm2.generateKeyPair();
+const keyPair = generateKeyPair();
 console.log('公钥:', keyPair.publicKey);
 console.log('私钥:', keyPair.privateKey);
 
 // 加密
 const message = 'Secret Message';
-const encrypted = sm2.encrypt(message, keyPair.publicKey);
+const encrypted = sm2Encrypt(keyPair.publicKey, message);
 console.log('密文:', encrypted);
 
 // 解密
-const decrypted = sm2.decrypt(encrypted, keyPair.privateKey);
+const decrypted = sm2Decrypt(keyPair.privateKey, encrypted);
 console.log('明文:', decrypted); // Secret Message
 
 // 签名
-const signature = sm2.sign(message, keyPair.privateKey);
+const signature = sign(keyPair.privateKey, message);
 console.log('签名:', signature);
 
 // 验签
-const isValid = sm2.verify(message, signature, keyPair.publicKey);
+const isValid = verify(keyPair.publicKey, message, signature);
 console.log('验签结果:', isValid); // true
+
+// 使用面向对象 API
+import { SM2 } from 'smkit';
+
+const sm2 = SM2.generateKeyPair();
+const ct = sm2.encrypt('Hello');
+const pt = sm2.decrypt(ct);
 ```
 
 @tab Java
 
 ```java
-import cn.smkit.SM2;
-import cn.smkit.KeyPair;
+import io.github.smkit.sm2.SM2Util;
+import io.github.smkit.sm2.KeyPair;
 
 public class SM2Demo {
     public static void main(String[] args) {
-        // 创建 SM2 实例
-        SM2 sm2 = new SM2();
-        
         // 生成密钥对
-        KeyPair keyPair = sm2.generateKeyPair();
+        KeyPair keyPair = SM2Util.generateKeyPair();
         System.out.println("公钥: " + keyPair.getPublicKey());
         System.out.println("私钥: " + keyPair.getPrivateKey());
         
         // 加密
         String message = "Secret Message";
-        String encrypted = sm2.encrypt(message, keyPair.getPublicKey());
+        String encrypted = SM2Util.encrypt(keyPair.getPublicKey(), message);
         System.out.println("密文: " + encrypted);
         
         // 解密
-        String decrypted = sm2.decrypt(encrypted, keyPair.getPrivateKey());
+        String decrypted = SM2Util.decrypt(keyPair.getPrivateKey(), encrypted);
         System.out.println("明文: " + decrypted); // Secret Message
         
         // 签名
-        String signature = sm2.sign(message, keyPair.getPrivateKey());
+        String signature = SM2Util.sign(keyPair.getPrivateKey(), message);
         System.out.println("签名: " + signature);
         
         // 验签
-        boolean isValid = sm2.verify(message, signature, keyPair.getPublicKey());
+        boolean isValid = SM2Util.verify(keyPair.getPublicKey(), message, signature);
         System.out.println("验签结果: " + isValid); // true
     }
 }
@@ -355,94 +334,54 @@ public class SM2Demo {
 - 📋 建立完善的密钥管理制度
 :::
 
-## 进阶配置
+## 常见问题
 
-### 自定义配置
+### 如何选择合适的算法？
 
-::: code-tabs#lang
+- **对称加密**（SM4）：适用于大量数据加密，如文件、数据库字段
+- **非对称加密**（SM2）：适用于密钥交换、数字签名、少量数据加密
+- **哈希算法**（SM3）：适用于数据完整性校验、密码存储、数字签名
 
-@tab:active TypeScript
+### 密钥长度要求
 
-```typescript
-import { SM4, Mode, Padding } from '@smkit/core';
+- **SM2**：私钥 256 位（64 个十六进制字符），公钥 512 位（130 个十六进制字符，04 开头）
+- **SM3**：无密钥（哈希算法）或任意长度（HMAC）
+- **SM4**：128 位（32 个十六进制字符）
 
-// 使用自定义配置创建实例
-const sm4 = new SM4({
-  mode: Mode.GCM,           // 使用 GCM 模式
-  padding: Padding.PKCS7,   // PKCS7 填充
-  iv: 'custom-iv-16-bytes', // 自定义初始向量
-});
-
-// 使用配置进行加密
-const encrypted = sm4.encrypt(plaintext, key);
-```
-
-@tab Java
-
-```java
-import cn.smkit.SM4;
-import cn.smkit.SM4Config;
-import cn.smkit.Mode;
-import cn.smkit.Padding;
-
-// 创建自定义配置
-SM4Config config = SM4Config.builder()
-    .mode(Mode.GCM)              // 使用 GCM 模式
-    .padding(Padding.PKCS7)      // PKCS7 填充
-    .iv("custom-iv-16-bytes")    // 自定义初始向量
-    .build();
-
-// 使用配置创建实例
-SM4 sm4 = new SM4(config);
-
-// 使用配置进行加密
-String encrypted = sm4.encrypt(plaintext, key);
-```
-
-:::
-
-### 错误处理
+### 如何生成安全的密钥？
 
 ::: code-tabs#lang
 
 @tab:active TypeScript
 
 ```typescript
-import { SM4, SMKitError, ErrorCode } from '@smkit/core';
+import * as crypto from 'crypto';
 
-try {
-  const sm4 = new SM4();
-  const encrypted = sm4.encrypt(plaintext, 'invalid-key');
-} catch (error) {
-  if (error instanceof SMKitError) {
-    console.error('错误代码:', error.code);
-    console.error('错误信息:', error.message);
-    
-    if (error.code === ErrorCode.INVALID_KEY_LENGTH) {
-      console.error('密钥长度不正确，SM4 需要 16 字节密钥');
-    }
-  }
-}
+// 生成 SM4 密钥（128位）
+const sm4Key = crypto.randomBytes(16).toString('hex');
+console.log('SM4 密钥:', sm4Key);
+
+// 生成 SM2 密钥对（使用库函数）
+import { generateKeyPair } from 'smkit';
+const sm2KeyPair = generateKeyPair();
 ```
 
 @tab Java
 
 ```java
-import cn.smkit.SM4;
-import cn.smkit.SMKitException;
-import cn.smkit.ErrorCode;
+import java.security.SecureRandom;
+import io.github.smkit.SmKitUtil;
+import io.github.smkit.sm2.SM2Util;
 
-try {
-    SM4 sm4 = new SM4();
-    String encrypted = sm4.encrypt(plaintext, "invalid-key");
-} catch (SMKitException e) {
-    System.err.println("错误代码: " + e.getCode());
-    System.err.println("错误信息: " + e.getMessage());
-    
-    if (e.getCode() == ErrorCode.INVALID_KEY_LENGTH) {
-        System.err.println("密钥长度不正确，SM4 需要 16 字节密钥");
-    }
-}
+// 生成 SM4 密钥（128位）
+SecureRandom random = new SecureRandom();
+byte[] keyBytes = new byte[16];
+random.nextBytes(keyBytes);
+String sm4Key = SmKitUtil.bytesToHex(keyBytes);
+System.out.println("SM4 密钥: " + sm4Key);
+
+// 生成 SM2 密钥对（使用库函数）
+KeyPair sm2KeyPair = SM2Util.generateKeyPair();
 ```
 
 :::
@@ -453,88 +392,85 @@ try {
 - ❌ 在 ECB 模式下加密大量数据
 - ❌ 不验证输入数据的有效性
 - ❌ 硬编码密钥在代码中
+- ❌ 重复使用相同的 IV（初始向量）
 :::
 
-## 性能优化建议
+## 性能建议
 
 ### 1. 实例复用
 
-::: tip 最佳实践
-```typescript
-// ❌ 不好的做法 - 每次都创建新实例
-function encrypt(data: string) {
-  const sm4 = new SM4();
-  return sm4.encrypt(data, key);
-}
-
-// ✅ 好的做法 - 复用实例
-const sm4 = new SM4();
-function encrypt(data: string) {
-  return sm4.encrypt(data, key);
-}
-```
-:::
-
-### 2. 批量操作
-
-对于大量数据的加密，使用流式 API：
-
-```typescript
-import { SM4Stream } from '@smkit/core';
-
-const stream = new SM4Stream(key);
-stream.on('data', (chunk) => {
-  // 处理加密后的数据块
-});
-stream.write(largeData);
-stream.end();
-```
-
-### 3. 使用硬件加速
-
-::: info 硬件加速
-SMKit 自动检测并使用硬件加速：
-- **AES-NI**：Intel/AMD CPU 的 AES 指令集
-- **ARMv8 Crypto**：ARM 架构的加密扩展
-- **GPU 加速**：支持 CUDA 和 OpenCL
-
-无需额外配置，自动启用！
-:::
-
-## 调试和日志
-
-### 启用调试模式
+对于频繁的加密操作，复用实例可以提高性能：
 
 ::: code-tabs#lang
 
 @tab:active TypeScript
 
 ```typescript
-import { SMKit } from '@smkit/core';
+import { SM4 } from 'smkit';
 
-// 启用调试模式
-SMKit.setLogLevel('debug');
+// ✅ 好的做法 - 复用实例
+const sm4 = SM4.ECB('0123456789abcdeffedcba9876543210');
 
-// 使用自定义日志函数
-SMKit.setLogger({
-  debug: (msg) => console.debug('[DEBUG]', msg),
-  info: (msg) => console.info('[INFO]', msg),
-  warn: (msg) => console.warn('[WARN]', msg),
-  error: (msg) => console.error('[ERROR]', msg),
-});
+function encryptData(data: string) {
+  return sm4.encrypt(data);
+}
+
+// 多次加密
+const ct1 = encryptData('data1');
+const ct2 = encryptData('data2');
+const ct3 = encryptData('data3');
 ```
 
 @tab Java
 
 ```java
-import cn.smkit.SMKit;
-import cn.smkit.LogLevel;
+import io.github.smkit.sm4.SM4;
 
-// 启用调试模式
-SMKit.setLogLevel(LogLevel.DEBUG);
+// ✅ 好的做法 - 复用实例
+SM4 sm4 = new SM4()
+    .setKey("0123456789abcdeffedcba9876543210")
+    .setMode("ECB");
 
-// 使用 SLF4J 日志
-// SMKit 会自动使用项目中配置的 SLF4J 实现
+String ct1 = sm4.encrypt("data1");
+String ct2 = sm4.encrypt("data2");
+String ct3 = sm4.encrypt("data3");
+```
+
+:::
+
+### 2. 批量操作
+
+对于大量数据，使用并行处理：
+
+::: code-tabs#lang
+
+@tab:active TypeScript
+
+```typescript
+import { sm4Encrypt } from 'smkit';
+
+const key = '0123456789abcdeffedcba9876543210';
+const data = ['msg1', 'msg2', 'msg3'];
+
+// 并行加密
+const encrypted = await Promise.all(
+  data.map(msg => Promise.resolve(sm4Encrypt(key, msg)))
+);
+```
+
+@tab Java
+
+```java
+import io.github.smkit.sm4.SM4Util;
+import java.util.stream.Collectors;
+
+String key = "0123456789abcdeffedcba9876543210";
+List<String> data = Arrays.asList("msg1", "msg2", "msg3");
+
+// 并行加密
+List<String> encrypted = data.parallelStream()
+    .map(msg -> SM4Util.encrypt(key, msg))
+    .collect(Collectors.toList());
 ```
 
 :::
